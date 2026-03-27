@@ -2,7 +2,7 @@
 
 An AI-powered web application that helps students study smarter by generating summaries, quizzes, and interactive learning content.
 
-## Features
+##git add README.md Features
 
 * Automatic text summarization
 * Quiz generation from input text
@@ -38,6 +38,10 @@ http://127.0.0.1:5000/
 * User authentication
 * Better UI/UX
 * More AI-powered features
+
+## 📸 Preview
+![App Screenshot]
+![alt text](image.png)
 
 ## Author
 
