@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Study Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- General ---------- */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: #0d0d20;
+    color: #fff;
+    overflow-x: hidden;
+    transition: all 0.3s ease;
+}
+
+body.light-mode {
+    background: #f5f5f5;
+    color: #1a1a2e;
+}
+
+/* ---------- Container ---------- */
+.container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+    background: rgba(10,10,30,0.85);
+    border-radius: 15px;
+    box-shadow: 0 0 20px #9b00ff;
+    transition: all 0.3s ease;
+}
+
+body.light-mode .container {
+    background: rgba(245,245,245,0.9);
+    box-shadow: 0 0 20px #9b00ff33;
+    color: #1a1a2e;
+}
+
+/* ---------- Title & Description ---------- */
+h1 { color: #9b00ff; text-align: center; margin-bottom: 10px; }
+body.light-mode h1 { color: #7a1fff; }
+
+.description {
+    text-align: center;
+    color: #ccc;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+body.light-mode .description { color: #333; }
+
+/* ---------- Textarea ---------- */
+textarea {
+    width: 100%;
+    height: 150px;
+    border-radius: 10px;
+    border: 2px solid #9b00ff;
+    background: rgba(20,10,40,0.9);
+    color: #fff;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+    transition: all 0.3s ease;
+}
+body.light-mode textarea {
+    background: #fff;
+    color: #1a1a2e;
+    border: 2px solid #7a1fff;
+}
+
+/* ---------- Buttons ---------- */
+button {
+    display: inline-block;
+    margin: 10px 5px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #9b00ff;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+button:hover { background: #fff; color: #9b00ff; box-shadow: 0 0 10px #9b00ff; }
+body.light-mode button {
+    background: #7a1fff;
+    color: #fff;
+}
+body.light-mode button:hover { background: #fff; color: #7a1fff; box-shadow: 0 0 10px #7a1fff; }
+
+/* ---------- Toggle ---------- */
+.toggle-container { text-align: center; margin-bottom: 20px; }
+.toggle-container input[type="checkbox"] { display: none; }
+.toggle-container label {
+    cursor: pointer;
+    background: #9b00ff;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+.toggle-container input:checked + label { background: #fff; color: #9b00ff; }
+
+/* ---------- Result Sections ---------- */
+.section { display: none; margin-top: 20px; white-space: pre-wrap; line-height: 1.5; }
+.section h2 { color: #ffb3ff; margin-top: 15px; }
+body.light-mode .section h2 { color: #7a1fff; }
+.section ul li { margin-bottom: 8px; }
+
+/* ---------- Background Canvas ---------- */
+#bgCanvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -2; background: transparent;
+}
+
+/* ---------- Section Buttons ---------- */
+#sectionButtons { text-align: center; margin-top: 20px; }
+
+/* ---------- Chatbot Button ---------- */
+#chatbotBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #9b00ff;
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #9b00ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+body.light-mode #chatbotBtn { background: #7a1fff; }
+
+/* ---------- Chatbox Popup ---------- */
+#chatbox {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 350px;
+    max-height: 500px;
+    background: rgba(10,10,30,0.95);
+    border-radius: 15px;
+    box-shadow: 0 0 15px #9b00ff;
+    display: none;
+    flex-direction: column;
+    z-index: 1001;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+body.light-mode #chatbox { background: rgba(245,245,245,0.95); }
+
+/* Chat header */
+#chatboxHeader {
+    background: #9b00ff;
+    color: #fff;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+body.light-mode #chatboxHeader { background: #7a1fff; }
+
+/* Chat messages */
+#chatMessages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    color: #fff;
+}
+body.light-mode #chatMessages { color: #1a1a2e; }
+
+/* Chat input */
+#chatInputContainer {
+    display: flex;
+    border-top: 1px solid #9b00ff;
+}
+body.light-mode #chatInputContainer { border-top: 1px solid #7a1fff; }
+
+#chatInput {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+    outline: none;
+    background: transparent;
+    color: #fff;
+}
+body.light-mode #chatInput { color: #1a1a2e; }
+
+#sendBtn {
+    background: #9b00ff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+body.light-mode #sendBtn { background: #7a1fff; }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="container">
+    <h1>AI Study Assistant</h1>
+    <p class="description">This AI assistant can summarize text, generate quizzes, highlight key concepts, and provide step-by-step explanations.</p>
+
+    <div class="toggle-container">
+        <input type="checkbox" id="modeToggle">
+        <label for="modeToggle">Toggle Light/Dark Mode</label>
+    </div>
+
+    <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+    <button id="generateBtn">Generate</button>
+
+    <!-- Result Sections -->
+    <div id="summary" class="section"></div>
+    <div id="quiz" class="section"></div>
+    <div id="concepts" class="section"></div>
+    <div id="examples" class="section"></div>
+    <div id="step_by_step" class="section"></div>
+
+    <!-- Section Buttons -->
+    <div id="sectionButtons">
+        <button onclick="showSection('summary')">Summary</button>
+        <button onclick="showSection('quiz')">Quiz</button>
+        <button onclick="showSection('concepts')">Concepts</button>
+        <button onclick="showSection('examples')">Examples</button>
+        <button onclick="showSection('step_by_step')">Step-by-Step</button>
+    </div>
+</div>
+
+<!-- Chatbot button -->
+<div id="chatbotBtn">AI</div>
+
+<!-- Chatbox popup -->
+<div id="chatbox">
+    <div id="chatboxHeader">AI Chat</div>
+    <div id="chatMessages"></div>
+    <div id="chatInputContainer">
+        <input type="text" id="chatInput" placeholder="Type your question...">
+        <button id="sendBtn">Send</button>
+    </div>
+</div>
+
+<script>
+// ----- Dark/Light Mode -----
+const toggle = document.getElementById("modeToggle");
+toggle.addEventListener("change", () => document.body.classList.toggle("light-mode"));
+
+// ----- Section switching -----
+function showSection(id) {
+    ['summary','quiz','concepts','examples','step_by_step'].forEach(s=>document.getElementById(s).style.display='none');
+    document.getElementById(id).style.display='block';
+}
+
+// ----- Generate text button -----
+document.getElementById("generateBtn").addEventListener("click", async () => {
+    const text = document.getElementById("inputText").value.trim();
+    if(!text) return alert("Please enter text!");
+    ['summary','quiz','concepts','examples','step_by_step'].forEach(id=>document.getElementById(id).innerHTML='<p>Generating...</p>');
+
+    try {
+        const response = await fetch("/generate", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({text})
+        });
+        const data = await response.json();
+
+        document.getElementById('summary').innerHTML = `<h2>Summary:</h2><p>${data.summary}</p>`;
+        document.getElementById('quiz').innerHTML = `<h2>Quiz:</h2><ul>${data.quiz.map(q=>`<li>${q}</li>`).join('')}</ul>`;
+        document.getElementById('concepts').innerHTML = `<h2>Concepts:</h2><ul>${data.concepts.map(c=>`<li>${c.title} <img src="${c.img_url}" style="width:50px;height:50px;margin-left:5px;"></li>`).join('')}</ul>`;
+        document.getElementById('examples').innerHTML = `<h2>Examples:</h2><ul>${data.examples.map(e=>`<li>${e}</li>`).join('')}</ul>`;
+        document.getElementById('step_by_step').innerHTML = `<h2>Step by Step:</h2><p>${data.step_by_step}</p>`;
+        showSection('summary');
+    } catch(err){ console.error(err); alert('Error generating output'); }
+});
+
+// ----- Chatbox toggle -----
+const chatbotBtn = document.getElementById('chatbotBtn');
+const chatbox = document.getElementById('chatbox');
+chatbotBtn.addEventListener('click', () => {
+    chatbox.style.display = chatbox.style.display === 'flex' ? 'none' : 'flex';
+});
+
+// ----- Chat send -----
+const sendBtn = document.getElementById('sendBtn');
+const chatInput = document.getElementById('chatInput');
+const chatMessages = document.getElementById('chatMessages');
+
+async function sendMessage() {
+    const msg = chatInput.value.trim();
+    if(!msg) return;
+    chatMessages.innerHTML += `<p><strong>You:</strong> ${msg}</p>`;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatInput.value = '';
+
+    try {
+        const response = await fetch("/generate", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({text: msg})
+        });
+        const data = await response.json();
+        const reply = data.step_by_step || "Sorry, I couldn't generate a response.";
+        chatMessages.innerHTML += `<p><strong>AI:</strong> ${reply}</p>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    } catch(err){
+        chatMessages.innerHTML += `<p><strong>AI:</strong> Error fetching response.</p>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+chatInput.addEventListener('keypress', e => { if(e.key==='Enter') sendMessage(); });
+
+// ----- Animated background -----
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const nodes=[];
+for(let i=0;i<50;i++){nodes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5});}
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(let n of nodes){n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>canvas.width)n.vx*=-1;if(n.y<0||n.y>canvas.height)n.vy*=-1;ctx.fillStyle='#9b00ff';ctx.beginPath();ctx.arc(n.x,n.y,3,0,Math.PI*2);ctx.fill();}
+    for(let i=0;i<nodes.length;i++){for(let j=i+1;j<nodes.length;j++){let dx=nodes[i].x-nodes[j].x;let dy=nodes[i].y-nodes[j].y;let dist=Math.sqrt(dx*dx+dy*dy);if(dist<150){ctx.strokeStyle='rgba(155,0,255,0.2)';ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.stroke();}}}
+    requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
+</script>
+
+</body>
+</html>
