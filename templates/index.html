@@ -224,6 +224,8 @@ body.light-mode #sendBtn { background: #7a1fff; }
     <div id="concepts" class="section"></div>
     <div id="examples" class="section"></div>
     <div id="step_by_step" class="section"></div>
+    <div id="eli5" class="section"></div>
+    <div id="socratic" class="section"></div>
 
     <!-- Section Buttons -->
     <div id="sectionButtons">
@@ -232,6 +234,8 @@ body.light-mode #sendBtn { background: #7a1fff; }
         <button onclick="showSection('concepts')">Concepts</button>
         <button onclick="showSection('examples')">Examples</button>
         <button onclick="showSection('step_by_step')">Step-by-Step</button>
+        <button onclick="showSection('eli5')">ELI5</button>
+        <button onclick="showSection('socratic')">Socratic</button>
     </div>
 </div>
 
@@ -255,7 +259,7 @@ toggle.addEventListener("change", () => document.body.classList.toggle("light-mo
 
 // ----- Section switching -----
 function showSection(id) {
-    ['summary','quiz','concepts','examples','step_by_step'].forEach(s=>document.getElementById(s).style.display='none');
+    ['summary','quiz','concepts','examples','step_by_step','eli5','socratic'].forEach(s=>document.getElementById(s).style.display='none');
     document.getElementById(id).style.display='block';
 }
 
@@ -263,7 +267,7 @@ function showSection(id) {
 document.getElementById("generateBtn").addEventListener("click", async () => {
     const text = document.getElementById("inputText").value.trim();
     if(!text) return alert("Please enter text!");
-    ['summary','quiz','concepts','examples','step_by_step'].forEach(id=>document.getElementById(id).innerHTML='<p>Generating...</p>');
+    ['summary','quiz','concepts','examples','step_by_step','eli5','socratic'].forEach(id=>document.getElementById(id).innerHTML='<p>Generating...</p>');
 
     try {
         const response = await fetch("/generate", {
@@ -278,6 +282,14 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
         document.getElementById('concepts').innerHTML = `<h2>Concepts:</h2><ul>${data.concepts.map(c=>`<li>${c.title} <img src="${c.img_url}" style="width:50px;height:50px;margin-left:5px;"></li>`).join('')}</ul>`;
         document.getElementById('examples').innerHTML = `<h2>Examples:</h2><ul>${data.examples.map(e=>`<li>${e}</li>`).join('')}</ul>`;
         document.getElementById('step_by_step').innerHTML = `<h2>Step by Step:</h2><p>${data.step_by_step}</p>`;
+        // NEW — ELI5
+        document.getElementById('eli5').innerHTML =
+         `<h2>Explain Like I'm 5:</h2><p>${data.eli5}</p>`;
+        // NEW — Socratic
+        document.getElementById('socratic').innerHTML =
+         `<h2>Socratic Questions:</h2><ul>${
+            data.socratic.map(q => `<li>${q}</li>`).join('')
+        }</ul>`;
         showSection('summary');
     } catch(err){ console.error(err); alert('Error generating output'); }
 });
