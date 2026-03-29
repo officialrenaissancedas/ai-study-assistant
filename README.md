@@ -1,48 +1,19 @@
 # AI Study Assistant
 
-An AI-powered web application that helps students study smarter by generating summaries, quizzes, and interactive learning content.
-
-##git add README.md Features
-
-* Automatic text summarization
-* Quiz generation from input text
-* Dark / Light mode UI
-* Fast and simple interface
+An AI-powered study tool using FLAN-T5 for:
+- Summarization
+- Quiz generation
+- Concept extraction
+- ELI5 explanations
+- Socratic questioning
+- Chatbot interaction
 
 ## Tech Stack
+- Python (Flask)
+- Transformers (Hugging Face)
+- HTML/CSS/JS
 
-* Python (Flask)
-* HTML, CSS, JavaScript
-* NLP / AI APIs
-
-## Project Structure
-
-ai-study-assistant/
-│── app.py
-│── requirements.txt
-│── templates/
-│── static/
-
-## How to Run Locally
-
-```bash
-pip install -r requirements.txt
-python app.py
-```
-
-Then open:
-http://127.0.0.1:5000/
-
-## Future Improvements
-
-* User authentication
-* Better UI/UX
-* More AI-powered features
-
-## 📸 Preview
-![App Screenshot]
-![alt text](image.png)
-
-## Author
-
-Renaissance Das
+## Features
+- Clean AI outputs
+- Interactive learning modes
+- Chatbot integration
