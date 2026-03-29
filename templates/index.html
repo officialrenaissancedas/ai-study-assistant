@@ -314,14 +314,13 @@ async function sendMessage() {
     chatInput.value = '';
 
     try {
-        const response = await fetch("/generate", {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},
-            body: JSON.stringify({text: msg})
-        });
-        const data = await response.json();
-        const reply = data.step_by_step || "Sorry, I couldn't generate a response.";
-        chatMessages.innerHTML += `<p><strong>AI:</strong> ${reply}</p>`;
+        const response = await fetch("/chat", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({message: msg})
+});
+    const data = await response.json();
+    const reply = data.chat || "Sorry, I couldn't generate a response.";        chatMessages.innerHTML += `<p><strong>AI:</strong> ${reply}</p>`;
         chatMessages.scrollTop = chatMessages.scrollHeight;
     } catch(err){
         chatMessages.innerHTML += `<p><strong>AI:</strong> Error fetching response.</p>`;
